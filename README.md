@@ -9,4 +9,5 @@ https://reactnative.dev/docs/environment-setup?guide=quickstart
 
 Next, clone this repo
 Then, CD into cloned repo and install dependencies with npm install
+
 4. npx expo start
