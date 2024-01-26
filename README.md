@@ -7,5 +7,6 @@ https://youtu.be/0-S5a0eXPoc?si=T63fHzV33bmskhju&t=879
 Here is more resources to set up env with expo
 https://reactnative.dev/docs/environment-setup?guide=quickstart
 
-Next, clone this repo
-Then, CD into cloned repo and install dependencies with npm install then npx expo start
+Third, clone this repo
+Fourth, CD into cloned repo and install dependencies with npm install
+Fifth, npx expo start, then press i for IOS
