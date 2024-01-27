@@ -6,12 +6,28 @@ import { auth } from '../config/firebase';
 export default function Signup({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const isEmailValid = () => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const isPasswordValid = () => {
+    return password.length >= 6;
+  };
 
   const onHandleSignup = () => {
-    if (email !== '' && password !== '') {
-  createUserWithEmailAndPassword(auth, email, password)
-        .then(() => console.log('Signup success'))
-        .catch(err => console.log(`Login err: ${err}`));
+    if (isEmailValid() && isPasswordValid()) {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          console.log('Signup success');
+        })
+        .catch(err => {
+          setError('Email address already in use');
+          console.log(`Signup err: ${err}`);
+        });
+    } else {
+      setError('Invalid email or password');
     }
   };
 
@@ -38,10 +54,8 @@ export default function Signup({ navigation }) {
         onChangeText={text => setPassword(text)}
       />
       <Button onPress={onHandleSignup} color='#f57c00' title='Signup' />
-      <Button
-        onPress={() => navigation.navigate('Login')}
-        title='Go to Login'
-      />
+      <Text style={styles.errorText}>{error}</Text>
+      <Button onPress={() => navigation.navigate('Login')} title='Go to Login' />
     </View>
   );
 }
@@ -68,5 +82,10 @@ const styles = StyleSheet.create({
     borderColor: '#333',
     borderRadius: 8,
     padding: 12
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 10,
   }
 });

@@ -6,12 +6,24 @@ import { auth } from '../config/firebase';
 export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const isPasswordValid = () => {
+    return password.length >= 6;
+  };
 
   const onHandleLogin = () => {
-    if (email !== '' && password !== '') {
-     signInWithEmailAndPassword(auth, email, password)
-        .then(() => console.log('Login success'))
-        .catch(err => console.log(`Login err: ${err}`));
+    if (email !== '' && isPasswordValid()) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          console.log('Login success');
+        })
+        .catch(err => {
+          setError('Invalid email or password');
+          console.log(`Login err: ${err}`);
+        });
+    } else {
+      setError('Invalid email or password');
     }
   };
 
@@ -39,10 +51,8 @@ export default function Login({ navigation }) {
         onChangeText={text => setPassword(text)}
       />
       <Button onPress={onHandleLogin} color='#f57c00' title='Login' />
-      <Button
-        onPress={() => navigation.navigate('Signup')}
-        title='Go to Signup'
-      />
+      <Text style={styles.errorText}>{error}</Text>
+      <Button onPress={() => navigation.navigate('Signup')} title='Go to Signup' />
     </View>
   );
 }
@@ -69,5 +79,10 @@ const styles = StyleSheet.create({
     borderColor: '#333',
     borderRadius: 8,
     padding: 12
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 10,
   }
 });
