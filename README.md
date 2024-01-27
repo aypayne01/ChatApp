@@ -10,3 +10,9 @@ https://reactnative.dev/docs/environment-setup?guide=quickstart
 Third, clone this repo  <br />
 Fourth, CD into cloned repo and install dependencies with npm install  <br />
 Fifth, npx expo start, then press i for IOS
+
+
+Known issues with firebase right now
+https://github.com/firebase/firebase-js-sdk/issues/7962
+https://stackoverflow.com/questions/77853549/issue-with-firebase-on-expo-project
+https://stackoverflow.com/questions/77855924/error-while-reading-data-from-firestore-in-expo-project
