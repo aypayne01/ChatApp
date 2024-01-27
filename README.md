@@ -12,7 +12,7 @@ Fourth, CD into cloned repo and install dependencies with npm install  <br />
 Fifth, npx expo start, then press i for IOS
 
 
-Known issues with firebase right now <br />
+MAKE SURE FIRBASE IS NOT 10.7.2 Known issues with firebase right now <br />
 https://github.com/firebase/firebase-js-sdk/issues/7962 <br />
 https://stackoverflow.com/questions/77853549/issue-with-firebase-on-expo-project <br />
 https://stackoverflow.com/questions/77855924/error-while-reading-data-from-firestore-in-expo-project
