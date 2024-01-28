@@ -2,26 +2,29 @@ import React, {
   useState,
   useEffect,
   useLayoutEffect,
-  useCallback
-} from 'react';
-import { TouchableOpacity, Text } from 'react-native';
-import { GiftedChat } from 'react-native-gifted-chat';
+  useCallback,
+} from "react";
+import { TouchableOpacity, Text } from "react-native";
+import { GiftedChat } from "react-native-gifted-chat";
 import {
   collection,
   addDoc,
   orderBy,
   query,
-  onSnapshot
-} from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
+  onSnapshot,
+  startAfter,
+} from "firebase/firestore";
+import { signOut } from "firebase/auth";
 
-import { auth, database } from '../config/firebase';
+import { auth, database } from "../config/firebase";
 
 export default function Chat({ navigation }) {
   const [messages, setMessages] = useState([]);
+  const [loadingEarlier, setLoadingEarlier] = useState(false);
+  const [loadEarlier, setLoadEarlier] = useState(true);
 
-const onSignOut = () => {
-    signOut(auth).catch(error => console.log('Error logging out: ', error));
+  const onSignOut = () => {
+    signOut(auth).catch((error) => console.log("Error logging out: ", error));
   };
 
   useLayoutEffect(() => {
@@ -29,27 +32,27 @@ const onSignOut = () => {
       headerRight: () => (
         <TouchableOpacity
           style={{
-            marginRight: 10
+            marginRight: 10,
           }}
           onPress={onSignOut}
         >
           <Text>Logout</Text>
         </TouchableOpacity>
-      )
+      ),
     });
   }, [navigation]);
 
   useEffect(() => {
-    const collectionRef = collection(database, 'chats');
-    const q = query(collectionRef, orderBy('createdAt', 'desc'));
+    const collectionRef = collection(database, "chats");
+    const q = query(collectionRef, orderBy("createdAt", "desc"));
 
-    const unsubscribe = onSnapshot(q, querySnapshot => {
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       setMessages(
-        querySnapshot.docs.map(doc => ({
+        querySnapshot.docs.map((doc) => ({
           _id: doc.data()._id,
           createdAt: doc.data().createdAt.toDate(),
           text: doc.data().text,
-          user: doc.data().user
+          user: doc.data().user,
         }))
       );
     });
@@ -57,17 +60,45 @@ const onSignOut = () => {
     return () => unsubscribe();
   }, []);
 
+  const onLoadEarlier = async () => {
+    setLoadingEarlier(true);
+    const oldestMessage = messages[messages.length - 1];
+    const olderMessagesQuery = query(
+      collection(database, "chats"),
+      orderBy("createdAt", "desc"),
+      startAfter(oldestMessage.createdAt)
+    );
 
-const onSend = useCallback((messages = []) => {
-    setMessages(previousMessages =>
+    const newMessages = await onSnapshot(
+      olderMessagesQuery,
+      (querySnapshot) => {
+        return querySnapshot.docs.map((doc) => ({
+          _id: doc.data()._id,
+          createdAt: doc.data().createdAt.toDate(),
+          text: doc.data().text,
+          user: doc.data().user,
+        }));
+      }
+    );
+
+    setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+    setLoadingEarlier(false);
+
+    if (newMessages.length == 0) {
+      setLoadEarlier(false);
+    }
+  };
+
+  const onSend = useCallback((messages = []) => {
+    setMessages((previousMessages) =>
       GiftedChat.append(previousMessages, messages)
     );
-    const { _id, createdAt, text, user } = messages[0];    
-    addDoc(collection(database, 'chats'), {
+    const { _id, createdAt, text, user } = messages[0];
+    addDoc(collection(database, "chats"), {
       _id,
       createdAt,
       text,
-      user
+      user,
     });
   }, []);
 
@@ -75,10 +106,13 @@ const onSend = useCallback((messages = []) => {
     <GiftedChat
       messages={messages}
       showAvatarForEveryMessage={true}
-      onSend={messages => onSend(messages)}
+      onSend={(messages) => onSend(messages)}
+      onLoadEarlier={onLoadEarlier}
+      isLoadingEarlier={loadEarlier}
+      loadEarlier={loadEarlier}
       user={{
         _id: auth?.currentUser?.email,
-        avatar: 'https://i.pravatar.cc/300'
+        avatar: "https://i.pravatar.cc/300",
       }}
     />
   );
