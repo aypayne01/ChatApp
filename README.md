@@ -11,6 +11,7 @@ Third, clone this repo  <br />
 Fourth, CD into cloned repo and install dependencies with npm install  <br />
 Fifth, npx expo start, then press i for IOS
 
+If there are issues with dependencies, delete package-lock.json and redo npm install
 
 MAKE SURE FIRBASE IS NOT 10.7.2 Known issues with firebase right now <br />
 https://github.com/firebase/firebase-js-sdk/issues/7962 <br />
